@@ -1,0 +1,161 @@
+
+import React, { useState, useEffect } from "react";
+import Board from "../components/Board";
+import { Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import { getBoards, deleteBoard, saveBoard } from "../data/boardStorage"; // Import storage functions
+import EditBoardForm from "../components/EditBorderForm"; // Import the EditBoardForm
+
+export default function Home() {
+  const [boards, setBoards] = useState([]); // State to store boards
+  const [showActions, setShowActions] = useState(null); // State to manage visibility of actions for a specific board
+  const [editingBoard, setEditingBoard] = useState(null); // State to track which board is being edited
+  const [searchTerm, setSearchTerm] = useState(""); // State to manage search term
+
+  // Load boards from storage when the component mounts
+  useEffect(() => {
+    const savedBoards = getBoards();
+    setBoards(savedBoards);
+  }, []);
+
+  // Toggle actions visibility for a specific board
+  const toggleActions = (boardId) => {
+    setShowActions(showActions === boardId ? null : boardId);
+  };
+
+  // Handle board deletion
+  const handleDelete = (boardId) => {
+    deleteBoard(boardId); // Delete the board from storage
+    setBoards(getBoards()); // Refresh the boards list
+    setShowActions(null); // Close the actions menu
+  };
+
+  // Handle editing a board
+  const handleEdit = (board) => {
+    setEditingBoard(board); // Set the board to be edited
+  };
+
+  // Handle saving the edited board
+  const handleSave = (updatedBoard) => {
+    saveBoard(updatedBoard); // Save the updated board to localStorage
+    setBoards(getBoards()); // Refresh the boards list
+    setEditingBoard(null); // Close the edit form
+  };
+
+  // Filter boards based on search term
+  const filteredBoards = boards.filter((board) =>
+    board.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  return (
+    <>
+      <Navbar onSearch={setSearchTerm} />
+      <div className="w-full flex flex-col">
+        <div className="flex items-center justify-between mt-4 mr-4">
+          <header className="flex items-center justify-between">
+            <h3 className="mr-8 p-4 md:text-5xl text-2xl font-bold font-['Avenir_Next'] text-[32px] leading-[44px] tracking-[0%] px-4">
+              My boards
+            </h3>
+          </header>
+        </div>
+      </div>
+
+      {/* <Board /> */}
+
+      {/* Show Boards */}
+      <div className="flex flex-wrap justify-center gap-4 relative mt-3 ">
+        {filteredBoards.map((board) => (
+          <div
+            key={board.id}
+            className="flex w-34 max-w-lg mx-auto bg-white shadow-lg rounded-lg overflow-hidden"
+          >
+            {/* Left Side - Color Block */}
+            <div
+              className={`w-20 ${board.color}`}
+              // style={{ backgroundColor: board.color }}
+            ></div>
+
+            {/* Right Side - Description */}
+            <div className=" p-4 relative">
+              <div className="flex">
+                <div>
+                  <Link to={`/board/${board.id}`}>
+                    <p className="mt-2 text-gray-600">{board.name}</p>
+                  </Link>
+                </div>
+                <div>
+                  <button
+                    className="text-gray-500 hover:text-gray-700 m-2"
+                    // onClick={() => toggleActions(board.id)} // Toggle actions visibility
+                    onMouseEnter={() => toggleActions(board.id)}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z"
+                      />
+                    </svg>
+                  </button>
+                  {/* Edit and Delete Buttons */}
+                  {showActions === board.id && (
+                    <div className="absolute top-1 right-2 bg-white shadow-md rounded-md p-2 flex flex-col space-y-2" onMouseLeave={() => toggleActions(board.id)}>
+                      <button
+                        className="text-gray-600 hover:text-blue-500 flex items-center"
+                        onClick={() => handleEdit(board)} // Open edit form
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                        </svg>
+                        Edit
+                      </button>
+                      <button
+                        className="text-gray-600 hover:text-red-500 flex items-center"
+                        onClick={() => handleDelete(board.id)} // Delete the board
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          className="h-5 w-5 mr-2"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        Delete
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Render Edit Form if a board is being edited */}
+      {editingBoard && (
+        <EditBoardForm
+          board={editingBoard}
+          onClose={() => setEditingBoard(null)}
+          onSave={handleSave}
+        />
+      )}
+    </>
+  );
+}
