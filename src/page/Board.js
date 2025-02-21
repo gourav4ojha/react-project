@@ -15,7 +15,7 @@ import EditPostForm from "../components/EditPostForm";
 import Nopost from "../assets/backgroundimag.svg";
 
 export default function Board() {
-  const { boardId } = useParams(); // Get boardId from URL
+  const { id: boardId } = useParams();
   const [posts, setPosts] = useState([]);
   const [expandedPostId, setExpandedPostId] = useState(null);
   const [bookmarkedPosts, setBookmarkedPosts] = useState([]);
@@ -79,10 +79,11 @@ export default function Board() {
       />
       <Header isPostPage={true} />
 
-      <div className="flex flex-wrap justify-left gap-3 relative bg-green-200">
+      <div className="flex flex-wrap justify-left gap-3 relative min-h-screen bg-green-200">
         {filteredPosts.length > 0 ? (
           filteredPosts.map((post) => (
-            <div key={post.id} className="max-w-sm bg-white rounded-lg shadow-md overflow-hidden">
+            <div>
+            <div key={post.id} className="ml-10 max-w-sm max-h-sm bg-white rounded-lg shadow-md overflow-hidden">
               {/* Card Header */}
               <div className="flex items-center p-4 relative">
                 <div className="ml-3 flex-1">
@@ -197,7 +198,7 @@ export default function Board() {
                     className="h-6 w-6"
                     fill={likedPosts.includes(post.id) ? "red" : "none"}
                     viewBox="0 0 24 24"
-                    stroke="currentColor"
+                    stroke={likedPosts.includes(post.id) ? "none" : "currentColor"}
                   >
                     <path
                       strokeLinecap="round"
@@ -210,6 +211,8 @@ export default function Board() {
                 <h3 className="ml-1">{likedPosts.includes(post.id) ? 1 : 0}</h3>
               </div>
             </div>
+            </div>
+          
           ))
         ) : (
           <div className="h-screen">
