@@ -22,12 +22,3 @@ npm start
 ```
 http://localhost:3000
 ```
-
-
-## Features
-This application includes the following features:
-
-- Responsive layout using Tailwind CSS
-- Home page with a list of items
-- About page with information about the application
-- Contact page with a contact form
